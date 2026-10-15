@@ -120,7 +120,7 @@ namespace RaceDay.API.Migrations
                     b.HasKey("LoginProvider", "ProviderKey");
 
                     b.HasIndex("UserId");
-
+     
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
