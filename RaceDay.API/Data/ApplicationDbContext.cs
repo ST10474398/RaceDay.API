@@ -21,9 +21,7 @@ namespace RaceDay.API.Data
         {
             base.OnModelCreating(builder);
 
-            // ---------------------------------------------------------
-            // 1. USER (Organiser) -> EVENTS Relationship
-            // ---------------------------------------------------------
+     
 
             // Tell EF that these custom-named properties are the Primary Keys
             builder.Entity<EventEnrollment>().HasKey(en => en.EnrolmentID);
