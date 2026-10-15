@@ -90,7 +90,7 @@ namespace RaceDay.API.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)");     
 
                     b.HasKey("Id");
 
