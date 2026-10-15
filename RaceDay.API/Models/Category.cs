@@ -10,7 +10,7 @@ namespace RaceDay.API.Models
         public string? Description { get; set; } // Nullable
         public string AgeGroup { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+    
       
         public ICollection<Event> Events { get; set; } = new List<Event>();
     }
