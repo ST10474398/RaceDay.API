@@ -21,9 +21,7 @@ namespace RaceDay.API.Data
         {
             base.OnModelCreating(builder);
 
-            // ---------------------------------------------------------
-            // 1. USER (Organiser) -> EVENTS Relationship
-            // ---------------------------------------------------------
+     
 
             // Tell EF that these custom-named properties are the Primary Keys
             builder.Entity<EventEnrollment>().HasKey(en => en.EnrolmentID);
@@ -86,9 +84,7 @@ namespace RaceDay.API.Data
                 .HasForeignKey(es => es.SponsorID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ---------------------------------------------------------
-            // 7. UNIQUE CONSTRAINTS
-            // ---------------------------------------------------------
+          
             // A user cannot enrol twice in the same event
             builder.Entity<EventEnrollment>()
                 .HasIndex(en => new { en.UserID, en.EventID })

@@ -90,7 +90,7 @@ namespace RaceDay.API.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)");     
 
                     b.HasKey("Id");
 
@@ -111,7 +111,7 @@ namespace RaceDay.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
+                        .IsRequired()     
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
