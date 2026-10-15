@@ -9,7 +9,7 @@
         public int EventID { get; set; }
         public int SponsorID { get; set; }
 
-        // Navigation Properties
+       
         public Event? Event { get; set; }
         public Sponsor? Sponsor { get; set; }
     }
