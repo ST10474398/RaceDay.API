@@ -84,9 +84,7 @@ namespace RaceDay.API.Data
                 .HasForeignKey(es => es.SponsorID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ---------------------------------------------------------
-            // 7. UNIQUE CONSTRAINTS
-            // ---------------------------------------------------------
+          
             // A user cannot enrol twice in the same event
             builder.Entity<EventEnrollment>()
                 .HasIndex(en => new { en.UserID, en.EventID })
