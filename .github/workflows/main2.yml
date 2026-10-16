@@ -19,11 +19,11 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Restore NuGet packages
+    - name: Restore packages
       run: dotnet restore RaceDay.API.sln
 
     - name: Build solution
-      run: dotnet build RaceDay.API.sln --no-restore --configuration Release
+      run: dotnet build RaceDay.API.sln -c Release
 
-    - name: Run unit tests
-      run: dotnet test RaceDay.API.sln --no-build --configuration Release --verbosity normal
+    - name: Run tests (with diagnostic verbosity if fails)
+      run: dotnet test RaceDay.API.sln -c Release --logger "console;verbosity=detailed"
