@@ -2,9 +2,9 @@ name: .NET CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master", "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master", "main" ]
 
 jobs:
   build-and-test:
@@ -14,16 +14,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup .NET
+    - name: Setup .NET 8 SDK (Latest patch)
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '8.0.404'
 
-    - name: Restore dependencies
-      run: dotnet restore
+    - name: Restore NuGet packages
+      run: dotnet restore RaceDay.API.sln
 
     - name: Build solution
-      run: dotnet build --no-restore
+      run: dotnet build RaceDay.API.sln --no-restore --configuration Release
 
-    - name: Run unit tests
-      run: dotnet test --no-build --verbosity normal
+    - name: Run all unit tests
+      run: dotnet test RaceDay.API.sln --no-build --configuration Release --verbosity normal
