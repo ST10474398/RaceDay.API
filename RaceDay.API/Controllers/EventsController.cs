@@ -22,7 +22,6 @@ namespace RaceDay.API.Controllers
         }
 
         // GET: api/Events
-        // Both Organisers and Participants can view all events
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAllEvents()
@@ -79,18 +78,23 @@ namespace RaceDay.API.Controllers
         [Authorize(Roles = "Admin,Organiser")]
         public async Task<IActionResult> CreateEvent([FromBody] Event newEvent)
         {
-            // 1. Check if the Category exists
-            var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryID == newEvent.CategoryID);
-            if (!categoryExists)
+            // 1. FIRST, safely check if user is authenticated
+            if (User == null || User.Identity == null || !User.Identity.IsAuthenticated)
             {
-                return NotFound($"Category with ID {newEvent.CategoryID} does not exist. Please create a category first.");
+                return Unauthorized("You must be logged in to create an event.");
             }
 
-            // 2. Get the logged-in user's ID
             var organiserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(organiserId))
             {
                 return Unauthorized("You must be logged in to create an event.");
+            }
+
+            // 2. THEN, check if the Category exists
+            var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryID == newEvent.CategoryID);
+            if (!categoryExists)
+            {
+                return NotFound($"Category with ID {newEvent.CategoryID} does not exist. Please create a category first.");
             }
 
             // 3. Set the values
@@ -106,7 +110,6 @@ namespace RaceDay.API.Controllers
         }
 
         // PUT: api/Events/5
-        // ONLY Admin or Organiser can update events
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Organiser")]
         public async Task<IActionResult> UpdateEvent(int id, [FromBody] Event updatedEvent)
@@ -114,7 +117,6 @@ namespace RaceDay.API.Controllers
             var existingEvent = await _context.Events.FindAsync(id);
             if (existingEvent == null) return NotFound("Event not found.");
 
-            // Update the fields
             existingEvent.Name = updatedEvent.Name;
             existingEvent.Description = updatedEvent.Description;
             existingEvent.EventDate = updatedEvent.EventDate;
@@ -128,7 +130,6 @@ namespace RaceDay.API.Controllers
         }
 
         // DELETE: api/Events/5
-        // ONLY Admin or Organiser can delete events
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin,Organiser")]
         public async Task<IActionResult> DeleteEvent(int id)
@@ -139,7 +140,6 @@ namespace RaceDay.API.Controllers
 
             if (eventItem == null) return NotFound("Event not found.");
 
-            // Prevent deletion if there are enrolments
             if (eventItem.Enrolments.Any())
             {
                 return Conflict("Cannot delete an event that already has enrolments.");
@@ -152,7 +152,6 @@ namespace RaceDay.API.Controllers
         }
 
         // GET: api/Events/5/enrolments
-        // Admin/Organiser can view all enrolments for a specific event
         [HttpGet("{id}/enrolments")]
         [Authorize(Roles = "Admin,Organiser")]
         public async Task<IActionResult> GetEventEnrolments(int id)
