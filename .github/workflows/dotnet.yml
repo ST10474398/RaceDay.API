@@ -14,16 +14,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup .NET 8 SDK (Latest patch)
+    - name: Setup .NET 8 SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.404'
+        dotnet-version: '8.0.x'
 
-    - name: Restore NuGet packages
+    - name: Restore dependencies
       run: dotnet restore RaceDay.API.sln
 
     - name: Build solution
       run: dotnet build RaceDay.API.sln --no-restore --configuration Release
 
-    - name: Run all unit tests
+    - name: Run unit tests
       run: dotnet test RaceDay.API.sln --no-build --configuration Release --verbosity normal
