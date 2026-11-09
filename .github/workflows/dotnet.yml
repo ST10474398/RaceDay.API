@@ -1,4 +1,4 @@
-﻿name: .NET CI
+name: .NET CI
 
 on:
   push:
@@ -19,11 +19,14 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
+    # Build the API project
     - name: Build API
       run: dotnet build RaceDay.API/RaceDay.API.csproj --configuration Release
 
+    # Build the MVC project (nested inside the API folder)
     - name: Build MVC
       run: dotnet build RaceDay.API/RaceDay.MVC/RaceDay.MVC.csproj --configuration Release
 
+    # Run the tests (assuming the test project is also inside the API folder)
     - name: Run Unit Tests
-      run: dotnet test RaceDay.test/RaceDay_test.csproj --configuration Release --verbosity normal
+      run: dotnet test RaceDay.API/RaceDay.test/RaceDay_test.csproj --configuration Release --verbosity normal
