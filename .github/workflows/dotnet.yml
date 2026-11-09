@@ -19,14 +19,12 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    # Build the API
+    # The **/ tells GitHub to search all folders for the project file
     - name: Build API
       run: dotnet build **/RaceDay.API.csproj --configuration Release
 
-    # Find and build the MVC project (searching all folders)
     - name: Build MVC
       run: dotnet build **/RaceDay.MVC.csproj --configuration Release
 
-    # Find and run the test project (searching all folders)
-    - name: Run Unit Tests
+    - name: Run Tests
       run: dotnet test **/RaceDay_test.csproj --configuration Release --verbosity normal
