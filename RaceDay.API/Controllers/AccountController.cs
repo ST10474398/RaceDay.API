@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RaceDay.API.Models;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RaceDay.API.Controllers
@@ -18,11 +19,9 @@ namespace RaceDay.API.Controllers
             _signInManager = signInManager;
         }
 
-        // POST: api/Account/register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
-            // Validate the role
             var validRoles = new[] { "Admin", "Organiser", "Participant" };
             if (!validRoles.Contains(model.Role))
             {
@@ -38,12 +37,10 @@ namespace RaceDay.API.Controllers
                 IsActive = true
             };
 
-            // Create the user in the database (This automatically hashes the password!)
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
-                // Assign the role
                 await _userManager.AddToRoleAsync(user, model.Role);
                 return Ok(new { Message = "User registered successfully!" });
             }
@@ -51,7 +48,6 @@ namespace RaceDay.API.Controllers
             return BadRequest(result.Errors);
         }
 
-        // POST: api/Account/login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
@@ -59,20 +55,30 @@ namespace RaceDay.API.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(new { Message = "Login successful!" });
+                // Fetch the user to get their role
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user == null)
+                {
+                    return Unauthorized(new { Message = "User not found." });
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+                var userRole = roles.FirstOrDefault() ?? "Participant";
+
+                return Ok(new { Message = "Login successful!", Role = userRole });
             }
 
             return Unauthorized(new { Message = "Invalid email or password." });
         }
     }
 
-    // Data Transfer Objects (DTOs)
     public class RegisterDto
     {
-        public string FullName { get; set; } = string.Empty; // Changed from FirstName/LastName
+        public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty; // "Admin", "Organiser", or "Participant"
+        public string Role { get; set; } = string.Empty;
     }
 
     public class LoginDto

@@ -6,7 +6,13 @@ using RaceDay.API.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // This prevents the "object cycle" error when returning Events with Categories
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true; // Makes JSON readable
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -37,6 +43,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// --- NEW LINE ADDED HERE ---
+// This allows the API to serve the uploaded image files to the browser
+app.UseStaticFiles();
+// ---------------------------
 
 app.UseAuthentication(); // MUST be before Authorization
 app.UseAuthorization();

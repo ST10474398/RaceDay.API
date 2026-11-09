@@ -21,7 +21,6 @@ namespace RaceDay.API.Controllers
         }
 
         // GET: api/Categories
-        // Public / Any logged-in user can view
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAllCategories()
@@ -41,7 +40,6 @@ namespace RaceDay.API.Controllers
         }
 
         // POST: api/Categories
-        // ONLY Admin can create categories
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCategory([FromBody] Category newCategory)
@@ -53,7 +51,6 @@ namespace RaceDay.API.Controllers
         }
 
         // PUT: api/Categories/5
-        // ONLY Admin can update categories
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] Category updatedCategory)
@@ -70,7 +67,6 @@ namespace RaceDay.API.Controllers
         }
 
         // DELETE: api/Categories/5
-        // ONLY Admin can delete categories
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int id)
@@ -81,7 +77,6 @@ namespace RaceDay.API.Controllers
 
             if (category == null) return NotFound("Category not found.");
 
-            // Per Part 1 plan: 409 Conflict if category has events
             if (category.Events.Any())
             {
                 return Conflict("Cannot delete a category that has events assigned to it.");

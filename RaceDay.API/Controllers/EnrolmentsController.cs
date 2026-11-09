@@ -68,7 +68,6 @@ namespace RaceDay.API.Controllers
         }
 
         // GET: api/Enrolments/my
-        // Any logged-in user can view their own enrolments
         [HttpGet("my")]
         [Authorize]
         public async Task<IActionResult> GetMyEnrolments()
@@ -77,8 +76,8 @@ namespace RaceDay.API.Controllers
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
             var enrolments = await _context.EventEnrollments
-                .Include(en => en.Event)
-                .Include(en => en.Result)
+                .Include(en => en.Event) // Include the Event data
+                .Include(en => en.Result) // Include Results if they exist
                 .Where(en => en.UserID == userId)
                 .ToListAsync();
 

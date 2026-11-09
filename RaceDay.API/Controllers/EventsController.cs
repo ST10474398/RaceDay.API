@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RaceDay.API.Data;
 using RaceDay.API.Models;
 using System;
+using System.IO; // Required for Path and FileStream
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -23,7 +24,6 @@ namespace RaceDay.API.Controllers
 
         // GET: api/Events
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetAllEvents()
         {
             var events = await _context.Events
@@ -35,7 +35,6 @@ namespace RaceDay.API.Controllers
 
         // GET: api/Events/5
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<IActionResult> GetEventById(int id)
         {
             var eventItem = await _context.Events
@@ -73,12 +72,10 @@ namespace RaceDay.API.Controllers
         }
 
         // POST: api/Events
-        // ONLY Admin or Organiser can create events
         [HttpPost]
         [Authorize(Roles = "Admin,Organiser")]
         public async Task<IActionResult> CreateEvent([FromBody] Event newEvent)
         {
-            // 1. FIRST, safely check if user is authenticated
             if (User == null || User.Identity == null || !User.Identity.IsAuthenticated)
             {
                 return Unauthorized("You must be logged in to create an event.");
@@ -90,19 +87,16 @@ namespace RaceDay.API.Controllers
                 return Unauthorized("You must be logged in to create an event.");
             }
 
-            // 2. THEN, check if the Category exists
             var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryID == newEvent.CategoryID);
             if (!categoryExists)
             {
                 return NotFound($"Category with ID {newEvent.CategoryID} does not exist. Please create a category first.");
             }
 
-            // 3. Set the values
             newEvent.OrganiserID = organiserId;
             newEvent.CreatedAt = DateTime.UtcNow;
             newEvent.Status = "Upcoming";
 
-            // 4. Save to database
             _context.Events.Add(newEvent);
             await _context.SaveChangesAsync();
 
@@ -165,6 +159,83 @@ namespace RaceDay.API.Controllers
                 .ToListAsync();
 
             return Ok(enrolments);
+        }
+
+        // POST: api/Events/5/enrol
+        [HttpPost("{id}/enrol")]
+        [Authorize]
+        public async Task<IActionResult> EnrolInEvent(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("You must be logged in to enrol.");
+            }
+
+            var raceEvent = await _context.Events.FindAsync(id);
+            if (raceEvent == null) return NotFound("Event not found.");
+
+            var existingEnrolment = await _context.EventEnrollments
+                .FirstOrDefaultAsync(en => en.EventID == id && en.UserID == userId);
+
+            if (existingEnrolment != null)
+            {
+                return Conflict("You are already enrolled in this event.");
+            }
+
+            var currentEnrolments = await _context.EventEnrollments
+                .CountAsync(en => en.EventID == id && en.Status != "Cancelled");
+
+            if (currentEnrolments >= raceEvent.MaxParticipants)
+            {
+                return BadRequest("This event is already full.");
+            }
+
+            var enrolment = new EventEnrollment
+            {
+                EventID = id,
+                UserID = userId,
+                Status = "Pending",
+                EnrolledAt = DateTime.UtcNow
+            };
+
+            _context.EventEnrollments.Add(enrolment);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Enrolment successful. Awaiting approval.", EnrolmentID = enrolment.EnrolmentID });
+        }
+
+        // ---------------------------------------------------------
+        // LOCAL IMAGE UPLOAD (Replaces Azure)
+        // ---------------------------------------------------------
+        // POST: api/Events/upload-image
+        [HttpPost("upload-image")]
+        [Authorize(Roles = "Admin,Organiser")]
+        public async Task<IActionResult> UploadEventImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            // 1. Create the folder path (wwwroot/images inside the API project)
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // 2. Generate a unique file name
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // 3. Save the file to the local folder
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // 4. Return the URL path (relative to the API)
+            var imageUrl = $"/images/{fileName}";
+            return Ok(new { ImageUrl = imageUrl });
         }
     }
 }
