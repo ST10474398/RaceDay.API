@@ -19,10 +19,10 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    # 1. Build the API (we know this path is correct)
+    # Build the API (path is correct)
     - name: Build API
       run: dotnet build RaceDay.API/RaceDay.API.csproj --configuration Release
 
-    # 2. Find and run the tests (wildcard search)
+    # Run the tests (using the exact nested path we just found)
     - name: Run Unit Tests
-      run: dotnet test **/RaceDay_test.csproj --configuration Release --verbosity normal
+      run: dotnet test RaceDay.API/RaceDay.test/RaceDay.test.csproj --configuration Release --verbosity normal
