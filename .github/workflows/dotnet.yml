@@ -20,10 +20,10 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Build API
-      run: dotnet build RaceDay.API/RaceDay.API.csproj --configuration Release
+      run: dotnet build **/RaceDay.API.csproj --configuration Release
 
     - name: Build MVC
-      run: dotnet build RaceDay.API/RaceDay.MVC/RaceDay.MVC.csproj --configuration Release
+      run: dotnet build **/RaceDay.MVC.csproj --configuration Release
 
     - name: Run Unit Tests
-      run: dotnet test RaceDay.test/RaceDay_test.csproj --configuration Release --verbosity normal
+      run: dotnet test **/RaceDay_test.csproj --configuration Release --verbosity normal
