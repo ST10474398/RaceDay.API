@@ -1,0 +1,71 @@
+﻿@model RaceDay.MVC.Models.EventViewModel
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+<div class="container mt-5">
+
+    <!-- ERROR / SUCCESS MESSAGES -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Error:</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <strong><i class="bi bi-check-circle-fill"></i> Success!</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <!-- Event Image -->
+                <img src="https://images.unsplash.com/photo-1502904550040-7534597429ae?q=80&w=800&auto=format&fit=crop"
+                     class="card-img-top"
+                     alt="@Model.Name"
+                     style="height: 300px; object-fit: cover;">
+
+                <div class="card-header bg-dark text-warning">
+                    <h2 class="mb-0 fw-bold">@Model.Name</h2>
+                </div>
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Event Details</h5>
+
+                    <p class="text-muted"><i class="bi bi-geo-alt-fill text-danger"></i> <strong>Location:</strong> @Model.Location</p>
+                    <p class="text-muted"><i class="bi bi-calendar-check text-primary"></i> <strong>Date:</strong> @Model.EventDate.ToString("dd MMM yyyy")</p>
+                    <p class="text-muted"><i class="bi bi-people-fill text-success"></i> <strong>Max Participants:</strong> @Model.MaxParticipants</p>
+
+                    <hr />
+
+                    <h5 class="fw-bold">About this Event</h5>
+                    <p>@Model.Description</p>
+
+                    <hr />
+
+                    <h4>Enrol in this Event</h4>
+                    @if (Context.Session.GetString("AuthCookie") != null)
+                    {
+                        <form asp-action="Enrol" method="post">
+                            <input type="hidden" name="eventId" value="@Model.EventID" />
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold mt-3 px-5 shadow-sm rounded-pill">
+                                <i class="bi bi-ticket-perforated"></i> Enrol Now
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger mt-3">
+                            You must be logged in to enrol. <a asp-controller="Account" asp-action="Login" class="fw-bold">Click here to Login</a>.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

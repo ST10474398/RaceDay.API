@@ -1,0 +1,78 @@
+﻿@model List<RaceDay.MVC.Models.EnrolmentViewModel>
+@{
+    ViewData["Title"] = "Enter Results";
+    var eventId = ViewBag.EventID;
+}
+
+<div class="container mt-5">
+
+    <!-- Error/Success Messages -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <strong>Error:</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Enter Results for: <span class="text-primary">@ViewBag.EventName</span></h2>
+        <a asp-action="Dashboard" class="btn btn-outline-secondary fw-bold">Back to Dashboard</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            <h4>No approved participants yet.</h4>
+            <p>Go to "View Enrolments" and approve some participants first.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Participant</th>
+                            <th>Finish Time (HH:MM:SS)</th>
+                            <th>Position</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var participant in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold align-middle">@participant.ParticipantName</td>
+                                <td>
+                                    <form asp-action="EnterResults" method="post" class="row gx-2 align-items-center">
+                                        <input type="hidden" name="enrolmentId" value="@participant.EnrolmentID" />
+                                        <input type="hidden" name="eventId" value="@eventId" />
+
+                                        <div class="col-md-5">
+                                            <input type="text" name="finishTime" class="form-control" placeholder="e.g. 01:30:00" required />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" name="position" class="form-control" placeholder="Pos" min="1" required />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button type="submit" class="btn btn-success w-100">Save Result</button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,66 @@
+﻿@model RaceDay.MVC.Models.EventViewModel
+@{
+    ViewData["Title"] = "Create Event";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-warning text-center">
+                    <h3 class="mb-0 fw-bold"><i class="bi bi-calendar-plus"></i> Create a New Event</h3>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- IMPORTANT: enctype="multipart/form-data" is required for file uploads -->
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Event Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="e.g., City Marathon 2026" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Describe your event..."></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Event Date</label>
+                                <input asp-for="EventDate" type="datetime-local" class="form-control" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Location</label>
+                                <input asp-for="Location" class="form-control" placeholder="e.g., Central Park" required />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Max Participants</label>
+                                <input asp-for="MaxParticipants" type="number" class="form-control" placeholder="100" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Category ID</label>
+                                <input asp-for="CategoryID" type="number" class="form-control" placeholder="1" required />
+                            </div>
+                        </div>
+
+                        <!-- NEW FILE UPLOAD INPUT -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Event Banner Image</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*" required />
+                            <div class="form-text">Upload a banner image for the event (JPG, PNG).</div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold">Publish Event</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

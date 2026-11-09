@@ -1,0 +1,65 @@
+﻿@model List<RaceDay.MVC.Models.EventViewModel>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- Hero Section -->
+<div class="p-5 mb-4 bg-dark text-white rounded-3 shadow-sm" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+    <div class="container-fluid py-5">
+        <h1 class="display-4 fw-bold text-warning">Welcome to RaceDay</h1>
+        <p class="col-md-8 fs-4">Your ultimate platform for managing and joining running, cycling, and walking events.</p>
+        @if (Context.Session.GetString("AuthCookie") == null)
+        {
+            <a asp-controller="Account" asp-action="Register" class="btn btn-warning btn-lg mt-3 px-5 rounded-pill fw-bold">Get Started</a>
+        }
+    </div>
+</div>
+
+<!-- Upcoming Events Section -->
+<h2 class="mb-4 fw-bold text-center border-bottom pb-2">Upcoming Events</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info text-center" role="alert">
+        <h4 class="alert-heading">No upcoming events yet!</h4>
+        <p>Check back soon or log in as an Organiser to create one.</p>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var ev in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <!-- Event Image -->
+                    @if (!string.IsNullOrEmpty(ev.ImageUrl))
+                    {
+                        <img src="@ev.ImageUrl" class="card-img-top" alt="@ev.Name" style="height: 180px; object-fit: cover; border-radius: 0.25rem 0.25rem 0 0;">
+                    }
+                    else
+                    {
+                        <!-- Default placeholder image if no banner was uploaded -->
+                        <img src="https://images.unsplash.com/photo-1502904550040-7534597429ae?q=80&w=800&auto=format&fit=crop" class="card-img-top" alt="Default Event Image" style="height: 180px; object-fit: cover; border-radius: 0.25rem 0.25rem 0 0;">
+                    }
+
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title fw-bold mb-0">@ev.Name</h5>
+                            <span class="badge bg-success text-uppercase">@ev.Status</span>
+                        </div>
+                        <p class="card-text text-muted small mb-1"><i class="bi bi-geo-alt-fill"></i> @ev.Location</p>
+                        <p class="card-text text-muted small"><i class="bi bi-calendar-check"></i> @ev.EventDate.ToString("dd MMM yyyy")</p>
+                        <p class="card-text">@(string.IsNullOrEmpty(ev.Description) ? "No description available." : ev.Description)</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 pb-3">
+                        <!-- Proper Link to Details Page -->
+                        <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.EventID" class="btn btn-outline-dark w-100 rounded-pill fw-bold">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
