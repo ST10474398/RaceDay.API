@@ -1,4 +1,4 @@
-name: .NET CI
+﻿name: .NET CI
 
 on:
   push:
@@ -19,12 +19,8 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    # The **/ tells GitHub to search all folders for the project file
     - name: Build API
-      run: dotnet build **/RaceDay.API.csproj --configuration Release
+      run: dotnet build RaceDay.API/RaceDay.API.csproj --configuration Release
 
-    - name: Build MVC
-      run: dotnet build **/RaceDay.MVC.csproj --configuration Release
-
-    - name: Run Tests
-      run: dotnet test **/RaceDay_test.csproj --configuration Release --verbosity normal
+    - name: Run Unit Tests
+      run: dotnet test RaceDay.API/RaceDay.test/RaceDay.test.csproj --configuration Release --verbosity normal
