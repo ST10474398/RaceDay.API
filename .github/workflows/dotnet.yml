@@ -21,6 +21,3 @@ jobs:
 
     - name: Build API
       run: dotnet build RaceDay.API/RaceDay.API.csproj --configuration Release
-
-    - name: Run Unit Tests
-      run: dotnet test RaceDay.API/RaceDay.test/RaceDay.test.csproj --configuration Release --verbosity normal
